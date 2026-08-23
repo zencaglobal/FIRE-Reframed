@@ -1,5 +1,7 @@
 # FIRE Reframed — Interactive Companion
 
+### 👉 Explore the tool: **https://zencaglobal.github.io/FIRE-Reframed/**
+
 An interactive companion to the **FIRE Reframed** 7-part series. It lets readers
 play with the ideas instead of just reading them — and, true to the series, it
 deliberately refuses to hand anyone a single confident "FIRE number." It shows
