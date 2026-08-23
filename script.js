@@ -465,14 +465,14 @@
 
   // section id -> { part label, unlock instant (UTC) }
   const SCHEDULE = [
-    { id: "variables", part: "Part 1", iso: "2026-08-31T06:30:00Z" },
-    { id: "method",    part: "Part 1", iso: "2026-08-31T06:30:00Z" },
-    { id: "range",     part: "Part 2", iso: "2026-09-07T06:00:00Z" },
-    { id: "stress",    part: "Part 3", iso: "2026-09-14T06:00:00Z" },
-    { id: "enough",    part: "Part 4", iso: "2026-09-21T06:00:00Z" },
-    { id: "lifestyle", part: "Part 5", iso: "2026-09-28T06:00:00Z" },
-    { id: "buffer",    part: "Part 6", iso: "2026-10-05T06:00:00Z" },
-    { id: "gate",      part: "Part 7", iso: "2026-10-12T06:00:00Z" },
+    { id: "variables", part: "Part 1", iso: "2026-08-31T06:30:00Z", article: "https://zenca.global/p/fire-reframed-17-the-five-variables" },
+    { id: "method",    part: "Part 1", iso: "2026-08-31T06:30:00Z", article: null },
+    { id: "range",     part: "Part 2", iso: "2026-09-07T06:00:00Z", article: "https://zenca.global/p/fire-reframed-27-why-fire-numbers-lie" },
+    { id: "stress",    part: "Part 3", iso: "2026-09-14T06:00:00Z", article: "https://zenca.global/p/fire-reframed-37-stress-testing-fire" },
+    { id: "enough",    part: "Part 4", iso: "2026-09-21T06:00:00Z", article: "https://zenca.global/p/fire-reframed-47-arithmetic-of-enough" },
+    { id: "lifestyle", part: "Part 5", iso: "2026-09-28T06:00:00Z", article: "https://zenca.global/p/fire-reframed-57-retirement-equation" },
+    { id: "buffer",    part: "Part 6", iso: "2026-10-05T06:00:00Z", article: "https://zenca.global/p/fire-reframed-67-fi-is-easy-re-is-hard" },
+    { id: "gate",      part: "Part 7", iso: "2026-10-12T06:00:00Z", article: "https://zenca.global/p/fire-reframed-77-the-decision-gate" },
   ];
 
   const LOCK_SVG =
@@ -541,6 +541,19 @@
           '<span class="cd-lab">' + u + "</span></div>").join("") +
         "</div>";
       head.insertAdjacentElement("afterend", card);
+
+      // outbound "read the article" link — appended last, so it's hidden while
+      // locked and reveals with the section (which unlocks when the article
+      // itself goes live).
+      if (s.article) {
+        const link = document.createElement("a");
+        link.className = "read-article";
+        link.href = s.article;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.innerHTML = 'Read this part on Zenca <span aria-hidden="true">&rarr;</span>';
+        sec.appendChild(link);
+      }
 
       // nav chip
       const navLink = document.querySelector('.hero-nav a[href="#' + s.id + '"]');
