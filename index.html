@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIRE Reframed — An Interactive Companion</title>
+  <meta name="description" content="An interactive companion to the FIRE Reframed series. Retirement is a risk decision stretched over decades — not a single number." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top">FIRE&nbsp;Reframed</a>
+      <div class="topbar-right">
+        <div class="ccy" role="group" aria-label="Currency">
+          <button class="ccy-btn is-active" data-ccy="inr" type="button">₹ INR</button>
+          <button class="ccy-btn" data-ccy="usd" type="button">$ USD</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <p class="eyebrow">Interactive companion · 7-part series</p>
+      <h1>FIRE isn't a number.<br />It's a bet on decades.</h1>
+      <p class="lede">
+        Every FIRE calculator hands you one clean figure and calls it safety.
+        This companion does the opposite: it shows you the <em>range</em>, the
+        <em>fragility</em>, and the honest arithmetic underneath — so you can see
+        what your money actually supports, and what it's quietly assuming.
+      </p>
+      <nav class="hero-nav" aria-label="Sections">
+        <a href="#variables">The Five Variables</a>
+        <a href="#range">Why One Number Lies</a>
+        <a href="#stress">Small Errors Stack</a>
+        <a href="#enough">The Arithmetic of Enough</a>
+        <a href="#lifestyle">Lifestyle × Time</a>
+        <a href="#buffer">FI ≠ RE</a>
+        <a href="#gate">The Decision Gate</a>
+        <a href="#method">How it's calculated</a>
+      </nav>
+    </div>
+  </section>
+
+  <main class="wrap">
+
+    <!-- 1. FIVE VARIABLES ------------------------------------------------->
+    <section class="part" id="variables">
+      <div class="part-head">
+        <span class="part-num">Part 1</span>
+        <h2>The Five Variables</h2>
+        <p class="part-sub">
+          A FIRE number isn't an input you choose — it's an output derived from
+          five things. Move any one and the number moves with it. Set your
+          baseline here; every section below reacts to it.
+        </p>
+      </div>
+
+      <div class="controls card">
+        <div class="ctrl">
+          <label for="age">Current age <output id="age-out"></output></label>
+          <input type="range" id="age" min="25" max="60" step="1" value="40" />
+        </div>
+        <div class="ctrl">
+          <label for="life">Life expectancy <output id="life-out"></output></label>
+          <input type="range" id="life" min="75" max="100" step="1" value="90" />
+        </div>
+        <div class="ctrl">
+          <label for="ret">Expected return (post-retirement) <output id="ret-out"></output></label>
+          <input type="range" id="ret" min="3" max="12" step="0.5" value="8" />
+        </div>
+        <div class="ctrl">
+          <label for="infl">Your personal inflation <output id="infl-out"></output></label>
+          <input type="range" id="infl" min="3" max="12" step="0.5" value="7" />
+        </div>
+        <div class="ctrl ctrl-wide">
+          <label for="spend">Monthly spend today <output id="spend-out"></output></label>
+          <input type="range" id="spend" min="25000" max="1000000" step="5000" value="150000" />
+        </div>
+      </div>
+
+      <div class="derived">
+        <div class="stat">
+          <span class="stat-label">Years the corpus must last</span>
+          <span class="stat-value" id="years-val">—</span>
+        </div>
+        <div class="stat stat-hero">
+          <span class="stat-label">Corpus needed at your assumptions</span>
+          <span class="stat-value" id="corpus-val">—</span>
+          <span class="stat-note" id="corpus-note"></span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Real (after-inflation) return</span>
+          <span class="stat-value" id="real-val">—</span>
+        </div>
+      </div>
+      <p class="footnote">
+        Contributions and your current savings aren't on this list on purpose —
+        they change <em>when</em> you reach the corpus, not how large it must be.
+      </p>
+    </section>
+
+    <!-- 2. WHY ONE NUMBER LIES -------------------------------------------->
+    <section class="part" id="range">
+      <div class="part-head">
+        <span class="part-num">Part 2</span>
+        <h2>Why One Number Lies</h2>
+        <p class="part-sub">
+          The same person, the same spending — but shift the assumptions from
+          hopeful to prudent and "the number" spreads across a wide band. The
+          tidy 25× / 30× / 40× rules of thumb land almost anywhere inside it.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="range-band" id="range-band" aria-hidden="true">
+          <div class="band-fill" id="band-fill"></div>
+          <div class="band-marker" id="mark-base"><span>Your base</span></div>
+          <div class="band-tick" data-mult="25"><span>25×</span></div>
+          <div class="band-tick" data-mult="30"><span>30×</span></div>
+          <div class="band-tick" data-mult="40"><span>40×</span></div>
+        </div>
+        <div class="range-legend">
+          <div><span class="dot dot-opt"></span> Optimistic
+            <strong id="range-opt">—</strong></div>
+          <div><span class="dot dot-base"></span> Your base
+            <strong id="range-base">—</strong></div>
+          <div><span class="dot dot-con"></span> Prudent
+            <strong id="range-con">—</strong></div>
+        </div>
+        <p class="range-caption" id="range-caption"></p>
+      </div>
+      <p class="footnote">
+        Optimistic = returns +2%, inflation −1%, life expectancy −5 years.
+        Prudent = returns −2%, inflation +1%, life expectancy +5 years. Neither
+        is exotic. That's the point.
+      </p>
+    </section>
+
+    <!-- 3. SMALL ERRORS STACK --------------------------------------------->
+    <section class="part" id="stress">
+      <div class="part-head">
+        <span class="part-num">Part 3</span>
+        <h2>Small Errors Stack</h2>
+        <p class="part-sub">
+          FIRE plans rarely break on a crash. They break when reality is a
+          little worse than assumed — for a very long time. Here's what a single
+          plausible slip in each assumption does to the corpus you need, and
+          what happens when they arrive together.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="tornado" id="tornado"></div>
+        <div class="stack-result">
+          <div>
+            <span class="stat-label">If all four slip together</span>
+            <span class="stat-value" id="stack-val">—</span>
+          </div>
+          <div class="stack-delta" id="stack-delta"></div>
+        </div>
+      </div>
+      <p class="footnote">
+        Slips modelled: return −1%, inflation +1%, life expectancy +5 years,
+        spending +10%. Small on their own. Not so small stacked over decades.
+      </p>
+    </section>
+
+    <!-- 4. ARITHMETIC OF ENOUGH ------------------------------------------->
+    <section class="part" id="enough">
+      <div class="part-head">
+        <span class="part-num">Part 4</span>
+        <h2>The Arithmetic of Enough</h2>
+        <p class="part-sub">
+          Strip out every hopeful assumption. Say returns merely keep pace with
+          inflation — no compounding heroics. Then the math is deliberately
+          boring: <em>annual spend = corpus ÷ years remaining.</em> This is the
+          floor of what your money honestly supports.
+        </p>
+      </div>
+
+      <div class="card lens">
+        <div class="lens-controls">
+          <div class="ctrl">
+            <label for="e-corpus">Corpus <output id="e-corpus-out"></output></label>
+            <input type="range" id="e-corpus" min="10000000" max="1000000000" step="10000000" value="100000000" />
+          </div>
+          <div class="ctrl">
+            <label for="e-age">Retire at age <output id="e-age-out"></output></label>
+            <input type="range" id="e-age" min="25" max="60" step="1" value="40" />
+          </div>
+        </div>
+        <div class="lens-out">
+          <span class="stat-label">Honest monthly spend it supports</span>
+          <span class="stat-value big" id="e-monthly">—</span>
+          <span class="stat-note" id="e-note"></span>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="grid" id="enough-table"></table>
+      </div>
+      <p class="footnote">Assumes life expectancy 90. Highlighted cell tracks the lens above.</p>
+    </section>
+
+    <!-- 5. LIFESTYLE x TIME ----------------------------------------------->
+    <section class="part" id="lifestyle">
+      <div class="part-head">
+        <span class="part-num">Part 5</span>
+        <h2>Lifestyle × Time</h2>
+        <p class="part-sub">
+          Now flip the lens. Don't chase a net-worth fantasy — start with the
+          life you want, and the age you want it from. The corpus is just what
+          that costs: <em>monthly lifestyle × 12 × years remaining.</em>
+        </p>
+      </div>
+
+      <div class="card lens">
+        <div class="lens-controls">
+          <div class="ctrl">
+            <label for="l-spend">Lifestyle per month <output id="l-spend-out"></output></label>
+            <input type="range" id="l-spend" min="25000" max="1000000" step="5000" value="200000" />
+          </div>
+          <div class="ctrl">
+            <label for="l-age">Retire at age <output id="l-age-out"></output></label>
+            <input type="range" id="l-age" min="25" max="60" step="1" value="40" />
+          </div>
+        </div>
+        <div class="lens-out">
+          <span class="stat-label">Corpus that lifestyle requires</span>
+          <span class="stat-value big" id="l-corpus">—</span>
+          <span class="stat-note" id="l-note"></span>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="grid" id="lifestyle-table"></table>
+      </div>
+      <p class="footnote">Assumes life expectancy 90. Highlighted cell tracks the lens above.</p>
+    </section>
+
+    <!-- 6. FI != RE ------------------------------------------------------->
+    <section class="part" id="buffer">
+      <div class="part-head">
+        <span class="part-num">Part 6</span>
+        <h2>FI ≠ RE</h2>
+        <p class="part-sub">
+          Financial Independence means you <em>don't have to</em> earn. Early
+          Retirement means you <em>stop</em>. They sound alike. They aren't:
+          while income still flows, it absorbs shocks. Once it's gone, the
+          corpus absorbs everything.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="shock-picker">
+          <span>Send a shock:</span>
+          <button class="shock-btn is-active" data-shock="crash" type="button">Market drops 30%</button>
+          <button class="shock-btn" data-shock="expense" type="button">Big one-off expense</button>
+          <button class="shock-btn" data-shock="inflation" type="button">Inflation spikes</button>
+        </div>
+        <div class="buffer-grid">
+          <div class="buffer-col buffer-fi">
+            <h3>Still earning <span>(FI)</span></h3>
+            <p class="buffer-desc" id="fi-desc"></p>
+            <ul class="lever-list">
+              <li>work a little longer</li>
+              <li>save more</li>
+              <li>slow spending</li>
+              <li>shift timelines</li>
+            </ul>
+            <p class="buffer-verdict good">Mistakes are uncomfortable — but fixable.</p>
+          </div>
+          <div class="buffer-col buffer-re">
+            <h3>Retired early <span>(RE)</span></h3>
+            <p class="buffer-desc" id="re-desc"></p>
+            <ul class="lever-list">
+              <li>cut spending</li>
+              <li>sell assets</li>
+              <li class="lever-gone">work longer</li>
+              <li class="lever-gone">save more</li>
+            </ul>
+            <p class="buffer-verdict bad">Only two levers left. You're reacting, not adjusting.</p>
+          </div>
+        </div>
+      </div>
+      <p class="footnote">
+        "I'll just go back to work" isn't a buffer — it's an unpriced
+        assumption. Aim for freedom first, finality later.
+      </p>
+    </section>
+
+    <!-- 7. DECISION GATE -------------------------------------------------->
+    <section class="part" id="gate">
+      <div class="part-head">
+        <span class="part-num">Part 7</span>
+        <h2>The Decision Gate</h2>
+        <p class="part-sub">
+          Not a calculator. Not a single number. A pre-flight checklist for the
+          one line you can't easily undo. You should be able to say "yes" to
+          most of these before you quit.
+        </p>
+      </div>
+
+      <div class="gate-progress card">
+        <div class="gate-count">
+          <span class="stat-value" id="gate-num">0</span>
+          <span class="stat-label">of 21 honest yeses</span>
+        </div>
+        <div class="gate-bar"><div class="gate-bar-fill" id="gate-fill"></div></div>
+        <p class="gate-readout" id="gate-readout">Work through the seven tests below.</p>
+      </div>
+
+      <div id="gate-list" class="gate-list"></div>
+
+      <div class="decision-rule card">
+        <p class="rule-quote">"My plan survives bad luck, not just good math."</p>
+        <p>You're ready to quit only if that statement is true. If your number
+          works only when returns cooperate, inflation behaves, and life follows
+          averages — then you don't have financial independence. You have
+          financial hope.</p>
+      </div>
+    </section>
+
+    <!-- METHOD ------------------------------------------------------------>
+    <section class="part" id="method">
+      <div class="part-head">
+        <span class="part-num">The honest math</span>
+        <h2>How this is calculated</h2>
+        <p class="part-sub">
+          Nothing here is a black box. Every figure comes from one plain
+          equation, run with assumptions you set — and deliberately, none of it
+          pretends to more precision than it has.
+        </p>
+      </div>
+
+      <div class="method-grid">
+        <div class="card">
+          <h3 class="method-h">The one formula</h3>
+          <p>The corpus is the amount that, invested at your expected return,
+            funds withdrawals that grow with inflation for the years remaining:</p>
+          <pre class="formula">corpus = annual spend × (1 − k^years) ÷ (1 − k)
+
+where  k = (1 + inflation) ÷ (1 + return)</pre>
+          <p>When returns merely keep pace with inflation, <em>k</em> becomes 1
+            and the whole thing collapses to the arithmetic of enough:</p>
+          <pre class="formula">corpus = annual spend × years</pre>
+          <p class="method-note">That's the exact assumption behind the tables in
+            Parts 4 and 5 — and this tool reproduces every cell of them.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="method-h">What it assumes — and doesn't</h3>
+          <p>It's a deterministic thinking aid, not a financial planner. On
+            purpose, it holds a single return and inflation rate steady and
+            leaves out the rest:</p>
+          <ul class="method-list">
+            <li>no Monte Carlo or full sequence-of-returns risk (the shocks in
+              Parts 3 and 6 are illustrations, not simulations)</li>
+            <li>no taxes, fees, or one-off lumpy expenses</li>
+            <li>no pension or other income; a single life, not a couple</li>
+            <li>a flat, readable ₹100 : $1 conversion, not a live exchange rate</li>
+          </ul>
+          <p class="method-note">These are the same simplifications the series
+            makes. The point was never a precise number — it was to see the
+            range, and the fragility.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <p class="disclaimer">
+        This is educational content, not financial, investment, tax, or legal
+        advice. It shares perspectives and frameworks to help you think clearly —
+        your decisions are your own. Please think independently and do your own
+        research.
+      </p>
+      <p class="colophon">An interactive companion to the <strong>FIRE Reframed</strong> series.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
