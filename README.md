@@ -1,6 +1,6 @@
 # FIRE Reframed — Interactive Companion
 
-### 👉 Explore the tool: **https://zencaglobal.github.io/FIRE-Reframed/**
+### 👉 Explore the tool: **https://fire-reframed.zenca.global/**
 
 An interactive companion to the **FIRE Reframed** 7-part series. It lets readers
 play with the ideas instead of just reading them — and, true to the series, it
@@ -20,7 +20,7 @@ One scrolling page, seven deep-linkable sections:
 | `#gate` | The Decision Gate | Part 7 |
 
 Link an article straight to its companion piece with the anchor, e.g.
-`.../index.html#stress`.
+`https://fire-reframed.zenca.global/#stress`.
 
 ## Scheduled unlock
 
@@ -35,7 +35,7 @@ IST = UTC+5:30 year-round):
 
 | Part | Section | Goes live (IST) | UTC instant |
 |---|---|---|---|
-| 1 | The Five Variables + How it's calculated | 31 Aug 2026, 12:00 PM | `2026-08-31T06:30:00Z` |
+| 1 | The Five Variables + How it's calculated | 31 Aug 2026, 11:30 AM | `2026-08-31T06:00:00Z` |
 | 2 | Why One Number Lies | 7 Sep 2026, 11:30 AM | `2026-09-07T06:00:00Z` |
 | 3 | Small Errors Stack | 14 Sep 2026, 11:30 AM | `2026-09-14T06:00:00Z` |
 | 4 | The Arithmetic of Enough | 21 Sep 2026, 11:30 AM | `2026-09-21T06:00:00Z` |
@@ -140,6 +140,14 @@ Then visit `http://localhost:8000`.
    `https://<your-username>.github.io/fire-reframed/`
 
 Any future edit you push to `main` republishes automatically.
+
+## Custom domain
+
+The site serves at **https://fire-reframed.zenca.global/** via the `CNAME` file
+in the repo root plus a DNS `CNAME` record (`fire-reframed → zencaglobal.github.io`,
+DNS-only) on Cloudflare. The old `zencaglobal.github.io/FIRE-Reframed/` address
+redirects here automatically. To change the domain, edit the `CNAME` file and the
+GitHub Pages "Custom domain" setting together.
 
 ---
 

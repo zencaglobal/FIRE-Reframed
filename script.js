@@ -465,8 +465,8 @@
 
   // section id -> { part label, unlock instant (UTC) }
   const SCHEDULE = [
-    { id: "variables", part: "Part 1", iso: "2026-08-31T06:30:00Z", article: "https://zenca.global/p/fire-reframed-17-the-five-variables" },
-    { id: "method",    part: "Part 1", iso: "2026-08-31T06:30:00Z", article: null },
+    { id: "variables", part: "Part 1", iso: "2026-08-31T06:00:00Z", article: "https://zenca.global/p/fire-reframed-17-the-five-variables" },
+    { id: "method",    part: "Part 1", iso: "2026-08-31T06:00:00Z", article: null },
     { id: "range",     part: "Part 2", iso: "2026-09-07T06:00:00Z", article: "https://zenca.global/p/fire-reframed-27-why-fire-numbers-lie" },
     { id: "stress",    part: "Part 3", iso: "2026-09-14T06:00:00Z", article: "https://zenca.global/p/fire-reframed-37-stress-testing-fire" },
     { id: "enough",    part: "Part 4", iso: "2026-09-21T06:00:00Z", article: "https://zenca.global/p/fire-reframed-47-arithmetic-of-enough" },
