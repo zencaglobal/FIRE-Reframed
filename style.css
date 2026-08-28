@@ -353,7 +353,9 @@ table.grid tr.hot-row td { color: var(--ink); }
 
 /* ---------- Footer ---------- */
 .site-foot { border-top: 1px solid var(--line); padding: 40px 0 60px; margin-top: 40px; }
-.disclaimer { color: var(--ink-mute); font-size: 0.82rem; max-width: 72ch; }
+.disclaimer { color: var(--ink-mute); font-size: 0.82rem; }
+.disclaimer span { display: block; white-space: nowrap; }
+.disclaimer span + span { margin-top: 3px; }
 .colophon { color: var(--ink-soft); font-size: 0.9rem; margin-top: 14px; }
 .foot-nav { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; }
 .foot-nav a { color: var(--ink-soft); text-decoration: none; font-size: 0.85rem; transition: color 0.15s; }
@@ -371,4 +373,5 @@ table.grid tr.hot-row td { color: var(--ink); }
   .gate-body { padding-left: 22px; }
   .crumb-rest { display: none; }
   .topbar-right { gap: 12px; }
+  .disclaimer span { white-space: normal; }
 }
