@@ -25,7 +25,11 @@ const src = readFileSync(join(here, "..", "script.js"), "utf8");
 const m = src.match(/function requiredCorpus\([^)]*\)\s*\{[\s\S]*?\n  \}/);
 if (!m) { console.error("Could not locate requiredCorpus in script.js"); process.exit(1); }
 const requiredCorpus = new Function("return (" + m[0] + ")")();
-console.log("Extracted requiredCorpus() verbatim from script.js\n");
+
+const dm = src.match(/function drawdown\([^)]*\)\s*\{[\s\S]*?\n  \}/);
+if (!dm) { console.error("Could not locate drawdown in script.js"); process.exit(1); }
+const drawdown = new Function("return (" + dm[0] + ")")();
+console.log("Extracted requiredCorpus() and drawdown() verbatim from script.js\n");
 
 let passed = 0, failed = 0;
 const ok = (cond, label, detail = "") => {
@@ -153,6 +157,26 @@ console.log("\n3) Edge cases");
   // 1 year -> exactly one year's spend
   ok(rel(requiredCorpus(annual, 1, 8, 6), annual) < 1e-9,
      "a 1-year horizon needs exactly one year of spend");
+}
+
+console.log("\n4) Part 3 drawdown is consistent with the corpus formula");
+{
+  // A corpus sized to last `years` must, when drawn down under the same
+  // assumptions, run out at ~ age0 + years (the horizon it was sized for).
+  let worst = 0;
+  const age0 = 40, monthly = 150000, annual = monthly * 12;
+  for (let r = 3; r <= 12; r += 1) {
+    for (let g = 3; g <= 12; g += 1) {
+      for (const years of [20, 30, 40, 50]) {
+        const C = requiredCorpus(annual, years, r, g);
+        const cap = age0 + years + 40;
+        const runout = drawdown(C, monthly, r, g, age0, cap).runout;
+        worst = Math.max(worst, Math.abs(runout - (age0 + years)));
+      }
+    }
+  }
+  ok(worst <= 1, "corpus drawn down under its own assumptions runs out at the horizon",
+     "max age error = " + worst + " year(s) across 400 scenarios");
 }
 
 console.log(`\n${failed === 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED"} — ${passed} passed, ${failed} failed`);

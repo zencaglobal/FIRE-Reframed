@@ -128,6 +128,22 @@
       </div>
 
       <div class="card">
+        <p class="ctrl-intro">How sure are you about the three things you can't really know? Widen a band and watch the number spread.</p>
+        <div class="unc-controls">
+          <div class="ctrl">
+            <label for="u-ret">Return — sure within <output id="u-ret-out"></output></label>
+            <input type="range" id="u-ret" min="0" max="4" step="0.25" value="2" />
+          </div>
+          <div class="ctrl">
+            <label for="u-infl">Inflation — sure within <output id="u-infl-out"></output></label>
+            <input type="range" id="u-infl" min="0" max="4" step="0.25" value="1" />
+          </div>
+          <div class="ctrl">
+            <label for="u-life">Longevity — sure within <output id="u-life-out"></output></label>
+            <input type="range" id="u-life" min="0" max="10" step="1" value="5" />
+          </div>
+        </div>
+
         <div class="range-band" id="range-band" aria-hidden="true">
           <div class="band-fill" id="band-fill"></div>
           <div class="band-marker" id="mark-base"><span>Your Part&nbsp;1 number</span></div>
@@ -144,10 +160,17 @@
             <strong id="range-con">—</strong></div>
         </div>
         <p class="range-caption" id="range-caption"></p>
+
+        <div class="contrib">
+          <p class="contrib-title">What widens the band most</p>
+          <div class="contrib-row"><span class="contrib-lab">Returns</span><span class="contrib-track"><span class="contrib-bar" id="contrib-ret"></span></span><span class="contrib-val" id="contrib-ret-v">—</span></div>
+          <div class="contrib-row"><span class="contrib-lab">Inflation</span><span class="contrib-track"><span class="contrib-bar" id="contrib-infl"></span></span><span class="contrib-val" id="contrib-infl-v">—</span></div>
+          <div class="contrib-row"><span class="contrib-lab">Longevity</span><span class="contrib-track"><span class="contrib-bar" id="contrib-life"></span></span><span class="contrib-val" id="contrib-life-v">—</span></div>
+        </div>
       </div>
-      <p class="footnote assumptions">
-        <span>Optimistic = returns go up by 2%, inflation goes down by 1%, life expectancy goes down by 5 years.</span>
-        <span>Prudent = returns go down by 2%, inflation goes up by 1%, life expectancy goes up by 5 years.</span>
+      <p class="footnote assumptions" id="range-foot">
+        <span id="range-foot-opt"></span>
+        <span id="range-foot-con"></span>
         <span>Neither is exotic. That's the point.</span>
       </p>
     </section>
@@ -160,23 +183,48 @@
         <p class="part-sub lines">
           <span>FIRE plans rarely break on a crash.</span>
           <span>They break when reality is a little worse than assumed - for a very long time.</span>
-          <span>Here's what a single plausible slip in each assumption does to the corpus you need, and what happens when they arrive together.</span>
+          <span>Here's what a single plausible slip in each assumption does to how long your money lasts, and what happens when they arrive together.</span>
         </p>
       </div>
 
       <div class="card">
-        <div class="tornado" id="tornado"></div>
-        <div class="stack-result">
-          <div>
-            <span class="stat-label">If all four slip together</span>
-            <span class="stat-value" id="stack-val">—</span>
+        <p class="ctrl-intro">Nudge each assumption a little worse than plan — and toggle which ones happen at once.</p>
+        <div class="err-controls">
+          <div class="err-row" id="row-ret">
+            <label class="err-toggle"><input type="checkbox" id="t-ret" checked /><span>Return runs below plan</span></label>
+            <input type="range" id="e-ret" min="0" max="2" step="0.25" value="1" />
+            <output id="e-ret-out"></output>
           </div>
-          <div class="stack-delta" id="stack-delta"></div>
+          <div class="err-row" id="row-infl">
+            <label class="err-toggle"><input type="checkbox" id="t-infl" checked /><span>Inflation runs above plan</span></label>
+            <input type="range" id="e-infl" min="0" max="2" step="0.25" value="1" />
+            <output id="e-infl-out"></output>
+          </div>
+          <div class="err-row" id="row-spend">
+            <label class="err-toggle"><input type="checkbox" id="t-spend" checked /><span>Spending creeps up</span></label>
+            <input type="range" id="e-spend" min="0" max="20" step="1" value="10" />
+            <output id="e-spend-out"></output>
+          </div>
         </div>
+
+        <div class="runout" id="runout-card">
+          <span class="stat-label">Your Part 1 corpus runs out at</span>
+          <span class="runout-age" id="p3-runout">—</span>
+          <span class="runout-early" id="p3-early"></span>
+        </div>
+
+        <div class="chart-wrap">
+          <svg id="p3-chart" viewBox="0 0 640 280" role="img" aria-label="Portfolio balance over age: plan versus reality"></svg>
+        </div>
+        <div class="p3-legend">
+          <span><span class="dot dot-plan"></span> Plan</span>
+          <span><span class="dot dot-real"></span> Reality</span>
+        </div>
+        <p class="stack-proof" id="p3-stack"></p>
       </div>
-      <p class="footnote lines">
+      <p class="footnote lines" id="stress-foot">
         <span>Baseline is the corpus from the five variables you set in Part 1.</span>
-        <span>Slips modelled: return −1%, inflation +1%, life expectancy +5 years, spending +10%.</span>
+        <span id="stress-foot-slips"></span>
         <span>Small on their own. Not so small stacked over decades.</span>
       </p>
     </section>

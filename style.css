@@ -192,20 +192,44 @@ input[type="range"]::-moz-range-thumb {
 .dot-con { background: var(--bad); }
 .range-caption { margin: 18px 0 0; color: var(--ink-soft); font-size: 0.96rem; }
 
-/* ---------- Tornado (Part 3) ---------- */
-.tornado { display: flex; flex-direction: column; gap: 14px; }
-.tor-row { display: grid; grid-template-columns: 160px 1fr auto; align-items: center; gap: 14px; }
-.tor-label { font-size: 0.88rem; color: var(--ink-soft); }
-.tor-track { background: var(--card-2); border-radius: 999px; height: 20px; overflow: hidden; }
-.tor-bar { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold-soft), var(--gold)); transition: width 0.35s ease; }
-.tor-delta { font-size: 0.9rem; font-weight: 600; color: var(--gold); font-variant-numeric: tabular-nums; min-width: 90px; text-align: right; }
+/* ---------- Shared control intro (Parts 2 & 3) ---------- */
+.ctrl-intro { color: var(--ink-soft); font-size: 0.94rem; margin: 0 0 20px; }
 
-.stack-result {
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  margin-top: 26px; padding-top: 22px; border-top: 1px dashed var(--line);
+/* ---------- Part 2: uncertainty sliders + contribution ---------- */
+.unc-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px 30px; margin-bottom: 30px; }
+.contrib { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--line); }
+.contrib-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-mute); margin: 0 0 14px; }
+.contrib-row { display: grid; grid-template-columns: 84px 1fr auto; align-items: center; gap: 12px; margin: 8px 0; font-size: 0.86rem; color: var(--ink-soft); }
+.contrib-track { height: 14px; background: var(--card-2); border-radius: 999px; overflow: hidden; }
+.contrib-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold-soft), var(--gold)); border-radius: 999px; transition: width 0.3s ease; }
+.contrib-val { font-variant-numeric: tabular-nums; color: var(--ink); min-width: 72px; text-align: right; }
+
+/* ---------- Part 3: error toggles, runout, trajectory ---------- */
+.err-controls { display: flex; flex-direction: column; gap: 15px; margin-bottom: 24px; }
+.err-row { display: grid; grid-template-columns: 220px 1fr 60px; align-items: center; gap: 16px; transition: opacity 0.2s; }
+.err-row.off { opacity: 0.4; }
+.err-toggle { display: flex; align-items: center; gap: 11px; font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; }
+.err-toggle input { width: 17px; height: 17px; accent-color: var(--gold); cursor: pointer; flex: 0 0 auto; }
+.err-row > output { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; text-align: right; }
+
+.runout {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+  margin: 6px 0 22px; padding: 20px;
+  background: linear-gradient(160deg, rgba(224,122,95,0.12), var(--card));
+  border: 1px solid var(--bad); border-radius: 12px;
 }
-.stack-result .stat-value { color: var(--bad); }
-.stack-delta { font-size: 1rem; font-weight: 600; color: var(--bad); }
+.runout.on-plan { background: linear-gradient(160deg, rgba(111,207,151,0.10), var(--card)); border-color: var(--good); }
+.runout-age { font-family: "Fraunces", serif; font-size: 2.6rem; line-height: 1; color: var(--bad); }
+.runout.on-plan .runout-age { color: var(--good); }
+.runout-early { font-size: 0.95rem; color: var(--ink-soft); }
+
+.chart-wrap { overflow-x: auto; margin-top: 6px; }
+#p3-chart { width: 100%; min-width: 440px; height: auto; display: block; }
+.p3-legend { display: flex; gap: 20px; font-size: 0.85rem; color: var(--ink-soft); margin-top: 10px; }
+.dot-plan { background: var(--gold); }
+.dot-real { background: var(--bad); }
+.stack-proof { margin: 16px 0 0; padding-top: 16px; border-top: 1px dashed var(--line); color: var(--ink-soft); font-size: 0.92rem; }
+.stack-proof strong { color: var(--bad); }
 
 /* ---------- Lens (Part 4/5) ---------- */
 .lens { display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; align-items: center; }
@@ -380,4 +404,7 @@ table.grid tr.hot-row td { color: var(--ink); }
   .topbar-right { gap: 12px; }
   .disclaimer span { white-space: normal; }
   .assumptions span { white-space: normal; }
+  .unc-controls { grid-template-columns: 1fr; }
+  .err-row { grid-template-columns: 1fr 56px; row-gap: 8px; }
+  .err-toggle { grid-column: 1 / -1; }
 }

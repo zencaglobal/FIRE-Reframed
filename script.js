@@ -86,25 +86,36 @@
     return corpus;
   }
 
-  /* ---------- Part 2: why one number lies --------------------------- */
+  /* ---------- Part 2: why one number lies (uncertainty explorer) ---- */
+
+  function unc() {
+    return { r: +$("u-ret").value, g: +$("u-infl").value, y: +$("u-life").value };
+  }
+  const pmPct = (x) => "±" + x + "%";
+  const pmYrs = (x) => "±" + x + (x === 1 ? " yr" : " yrs");
 
   function renderRange() {
     const v = vars();
-    const opt = requiredCorpus(v.annual, Math.max(1, v.years - 5), v.ret + 2, Math.max(0, v.infl - 1));
-    const base = requiredCorpus(v.annual, v.years, v.ret, v.infl);
-    const con = requiredCorpus(v.annual, v.years + 5, Math.max(0, v.ret - 2), v.infl + 1);
+    const u = unc();
+    $("u-ret-out").textContent = pmPct(u.r);
+    $("u-infl-out").textContent = pmPct(u.g);
+    $("u-life-out").textContent = pmYrs(u.y);
 
-    const m25 = v.annual * 25, m30 = v.annual * 30, m40 = v.annual * 40;
-    const maxV = Math.max(con, m40) * 1.08;
+    const base = requiredCorpus(v.annual, v.years, v.ret, v.infl);
+    const optYears = Math.max(1, v.years - u.y);
+    const conYears = v.years + u.y;
+    const opt = requiredCorpus(v.annual, optYears, v.ret + u.r, Math.max(0, v.infl - u.g));
+    const con = requiredCorpus(v.annual, conYears, Math.max(0, v.ret - u.r), v.infl + u.g);
+
+    const maxV = Math.max(con, v.annual * 40) * 1.08;
     const pos = (x) => Math.min(100, (x / maxV) * 100);
 
     const fill = $("band-fill");
     fill.style.left = pos(opt) + "%";
-    fill.style.width = Math.max(1, pos(con) - pos(opt)) + "%";
+    fill.style.width = Math.max(0.6, pos(con) - pos(opt)) + "%";
     $("mark-base").style.left = pos(base) + "%";
     document.querySelectorAll(".band-tick").forEach((t) => {
-      const mult = +t.dataset.mult;
-      t.style.left = pos(v.annual * mult) + "%";
+      t.style.left = pos(v.annual * +t.dataset.mult) + "%";
     });
 
     $("range-opt").textContent = money(opt);
@@ -112,49 +123,157 @@
     $("range-con").textContent = money(con);
 
     const spread = con - opt;
-    const ratio = con / opt;
-    $("range-caption").innerHTML =
-      "All three are built from the five variables you set in Part 1 — same person, same spending. The prudent number is <strong>" +
-      ratio.toFixed(1) + "×</strong> the optimistic one — a spread of <strong>" +
-      money(spread) + "</strong>. A rule-of-thumb multiple picks one dot on this line and calls it certainty.";
+    const ratio = opt > 0 ? con / opt : 1;
+    if (spread < 1) {
+      $("range-caption").innerHTML =
+        "With zero uncertainty there is exactly one number — <strong>" + money(base) +
+        "</strong>. But you can't really know these three. Admit some doubt above and watch the band open.";
+    } else {
+      $("range-caption").innerHTML =
+        "All three are built from the five variables you set in Part 1 — same person, same spending. The prudent number is <strong>" +
+        ratio.toFixed(1) + "×</strong> the optimistic one — a spread of <strong>" +
+        money(spread) + "</strong>. A rule-of-thumb multiple picks one dot on this line and calls it certainty.";
+    }
+
+    // How much does each uncertainty alone widen the band?
+    const cRet = requiredCorpus(v.annual, v.years, Math.max(0, v.ret - u.r), v.infl) -
+                 requiredCorpus(v.annual, v.years, v.ret + u.r, v.infl);
+    const cInfl = requiredCorpus(v.annual, v.years, v.ret, v.infl + u.g) -
+                  requiredCorpus(v.annual, v.years, v.ret, Math.max(0, v.infl - u.g));
+    const cLife = requiredCorpus(v.annual, conYears, v.ret, v.infl) -
+                  requiredCorpus(v.annual, optYears, v.ret, v.infl);
+    const cmax = Math.max(cRet, cInfl, cLife, 1);
+    const setC = (bar, val, c) => {
+      $(bar).style.width = (Math.max(0, c) / cmax * 100) + "%";
+      $(val).textContent = money(Math.max(0, c));
+    };
+    setC("contrib-ret", "contrib-ret-v", cRet);
+    setC("contrib-infl", "contrib-infl-v", cInfl);
+    setC("contrib-life", "contrib-life-v", cLife);
+
+    $("range-foot-opt").textContent =
+      "Optimistic = returns up " + u.r + "%, inflation down " + u.g + "%, life expectancy down " + u.y + " years.";
+    $("range-foot-con").textContent =
+      "Prudent = returns down " + u.r + "%, inflation up " + u.g + "%, life expectancy up " + u.y + " years.";
   }
 
-  /* ---------- Part 3: small errors stack ---------------------------- */
+  /* ---------- Part 3: small errors stack (fragility explorer) ------- */
 
-  function renderTornado() {
+  // Draw a corpus down year by year. Returns { pts:[[age,bal]], runout }.
+  function drawdown(C, monthly, retPct, inflPct, age0, capAge) {
+    const r = retPct / 100, g = inflPct / 100, annual0 = monthly * 12;
+    let bal = C;
+    const pts = [[age0, bal]];
+    let runout = null;
+    for (let t = 0; t < capAge - age0; t++) {
+      bal -= annual0 * Math.pow(1 + g, t);        // withdraw at start of year
+      if (bal <= 0) { runout = age0 + t; pts.push([age0 + t, 0]); break; }
+      bal *= (1 + r);                              // remainder grows
+      pts.push([age0 + t + 1, bal]);
+    }
+    if (runout === null) runout = capAge;
+    return { pts, runout };
+  }
+
+  function drawChart(plan, reality, age0, finish, runout) {
+    const W = 640, H = 280, padL = 46, padR = 16, padT = 16, padB = 30;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const xmax = finish;
+    let ymax = 0;
+    plan.pts.concat(reality.pts).forEach((p) => { if (p[0] <= xmax && p[1] > ymax) ymax = p[1]; });
+    ymax = ymax * 1.06 || 1;
+    const X = (a) => padL + (Math.min(a, xmax) - age0) / (xmax - age0) * plotW;
+    const Y = (b) => padT + (1 - b / ymax) * plotH;
+    const path = (pts) => pts.filter((p) => p[0] <= xmax + 1e-6)
+      .map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ");
+    const unit = mode === "inr" ? "₹ crore" : "$ million";
+    const axisVal = (rup) => (mode === "inr" ? rup / 1e7 : rup / 1e8);
+    const dp = axisVal(ymax) < 5 ? 1 : 0;
+    let s = "";
+    for (let i = 0; i <= 4; i++) {
+      const gy = (ymax * i) / 4, yy = Y(gy);
+      s += '<line x1="' + padL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + yy.toFixed(1) + '" stroke="#2c313d" stroke-width="1"/>';
+      s += '<text x="' + (padL - 6) + '" y="' + (yy + 3).toFixed(1) + '" fill="#7f8696" font-size="10" text-anchor="end">' + axisVal(gy).toFixed(dp) + '</text>';
+    }
+    for (let a = age0; a <= xmax; a += 10) {
+      s += '<text x="' + X(a).toFixed(1) + '" y="' + (H - 10) + '" fill="#7f8696" font-size="10" text-anchor="middle">' + a + '</text>';
+    }
+    if ((xmax - age0) % 10 !== 0) {
+      s += '<text x="' + X(xmax).toFixed(1) + '" y="' + (H - 10) + '" fill="#7f8696" font-size="10" text-anchor="middle">' + xmax + '</text>';
+    }
+    s += '<text x="' + padL + '" y="11" fill="#7f8696" font-size="10">' + unit + '</text>';
+    if (runout < xmax) {
+      s += '<line x1="' + X(runout).toFixed(1) + '" y1="' + Y(0).toFixed(1) + '" x2="' + X(runout).toFixed(1) + '" y2="' + padT + '" stroke="#e07a5f" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>';
+    }
+    s += '<path d="' + path(plan.pts) + '" fill="none" stroke="#e5b769" stroke-width="2.5"/>';
+    s += '<path d="' + path(reality.pts) + '" fill="none" stroke="#e07a5f" stroke-width="2.5"/>';
+    if (runout < xmax) {
+      const lx = X(runout), toEnd = lx > W - 130;
+      s += '<circle cx="' + lx.toFixed(1) + '" cy="' + Y(0).toFixed(1) + '" r="4" fill="#e07a5f"/>';
+      s += '<text x="' + (lx + (toEnd ? -8 : 8)).toFixed(1) + '" y="' + (Y(0) - 8).toFixed(1) +
+        '" fill="#e07a5f" font-size="11" font-weight="700" text-anchor="' + (toEnd ? "end" : "start") + '">runs out at ' + runout + '</text>';
+    }
+    $("p3-chart").innerHTML = s;
+  }
+
+  function renderStress() {
     const v = vars();
-    const base = requiredCorpus(v.annual, v.years, v.ret, v.infl);
+    const sRet = +$("e-ret").value, sInfl = +$("e-infl").value, sSpend = +$("e-spend").value;
+    $("e-ret-out").textContent = "−" + sRet + "%";
+    $("e-infl-out").textContent = "+" + sInfl + "%";
+    $("e-spend-out").textContent = "+" + sSpend + "%";
+    const onRet = $("t-ret").checked, onInfl = $("t-infl").checked, onSpend = $("t-spend").checked;
+    $("row-ret").classList.toggle("off", !onRet);
+    $("row-infl").classList.toggle("off", !onInfl);
+    $("row-spend").classList.toggle("off", !onSpend);
+    const eRet = onRet ? sRet : 0, eInfl = onInfl ? sInfl : 0, eSpend = onSpend ? sSpend : 0;
 
-    const factors = [
-      { label: "Return 1% lower", c: requiredCorpus(v.annual, v.years, v.ret - 1, v.infl) },
-      { label: "Inflation 1% higher", c: requiredCorpus(v.annual, v.years, v.ret, v.infl + 1) },
-      { label: "Live 5 years longer", c: requiredCorpus(v.annual, v.years + 5, v.ret, v.infl) },
-      { label: "Spend 10% more", c: requiredCorpus(v.annual * 1.1, v.years, v.ret, v.infl) },
-    ];
-    factors.forEach((f) => (f.delta = f.c - base));
-    const maxDelta = Math.max(...factors.map((f) => f.delta), 1);
+    const C = requiredCorpus(v.annual, v.years, v.ret, v.infl);
+    const finish = v.life;
+    const cap = Math.max(v.life + 20, 110);
+    const plan = drawdown(C, v.monthly, v.ret, v.infl, v.age, finish);
+    const reality = drawdown(C, v.monthly * (1 + eSpend / 100), v.ret - eRet, v.infl + eInfl, v.age, cap);
+    const runout = Math.min(reality.runout, cap);
+    const early = Math.max(0, finish - runout);
 
-    $("tornado").innerHTML = factors
-      .map((f) => {
-        const pct = (f.delta / base) * 100;
-        const w = (f.delta / maxDelta) * 100;
-        return (
-          '<div class="tor-row">' +
-          '<span class="tor-label">' + f.label + "</span>" +
-          '<span class="tor-track"><span class="tor-bar" style="width:' + w + '%"></span></span>' +
-          '<span class="tor-delta">+' + money(f.delta) + " · +" + pct.toFixed(0) + "%</span>" +
-          "</div>"
-        );
-      })
-      .join("");
+    $("p3-runout").textContent = "age " + runout;
+    const rc = $("runout-card");
+    if (early > 0) {
+      rc.classList.remove("on-plan");
+      $("p3-early").textContent = early + (early === 1 ? " year" : " years") + " early";
+    } else {
+      rc.classList.add("on-plan");
+      $("p3-early").textContent = "on plan — lasts to " + finish;
+    }
 
-    const all = requiredCorpus(v.annual * 1.1, v.years + 5, v.ret - 1, v.infl + 1);
-    const allDelta = all - base;
-    const allPct = (allDelta / base) * 100;
-    $("stack-val").textContent = money(all);
-    $("stack-delta").innerHTML =
-      "+" + money(allDelta) + " over your Part 1 number — <strong>+" + allPct.toFixed(0) +
-      "%</strong> more corpus, from four small, plausible slips.";
+    drawChart(plan, reality, v.age, finish, runout);
+
+    // Individual vs stacked shortfall (the "stacking" proof)
+    const ro = (er, ei, es) =>
+      Math.min(drawdown(C, v.monthly * (1 + es / 100), v.ret - er, v.infl + ei, v.age, cap).runout, cap);
+    const ind = [];
+    if (onRet && sRet > 0) ind.push({ n: "return", y: Math.max(0, finish - ro(sRet, 0, 0)) });
+    if (onInfl && sInfl > 0) ind.push({ n: "inflation", y: Math.max(0, finish - ro(0, sInfl, 0)) });
+    if (onSpend && sSpend > 0) ind.push({ n: "spending", y: Math.max(0, finish - ro(0, 0, sSpend)) });
+    const worst = ind.reduce((m, p) => Math.max(m, p.y), 0);
+
+    if (ind.length >= 2 && early > 0) {
+      const parts = ind.map((p) => p.n + " −" + p.y + "y").join(", ");
+      $("p3-stack").innerHTML = "Each is only a nudge off plan. On their own: " + parts +
+        ". But reality rarely sends them one at a time — stacked, they take <strong>−" + early +
+        " years</strong> off your runway, well past the worst single slip (−" + worst + "y).";
+    } else if (ind.length === 1 && early > 0) {
+      $("p3-stack").innerHTML = "Just this one nudge already costs <strong>−" + early + (early === 1 ? " year" : " years") +
+        "</strong>. Toggle another on and watch them stack.";
+    } else if (ind.length === 0) {
+      $("p3-stack").textContent = "No slips active — your Part 1 corpus lasts to " + finish +
+        ", exactly as planned. Toggle a slip on.";
+    } else {
+      $("p3-stack").textContent = "Small enough that the corpus still lasts to " + finish + ". Nudge them up.";
+    }
+
+    $("stress-foot-slips").textContent = "Slips modelled: return −" + sRet + "%, inflation +" + sInfl +
+      "%, spending +" + sSpend + "%" + (onRet && onInfl && onSpend ? "." : " (only the ticked ones apply).");
   }
 
   /* ---------- Part 4: arithmetic of enough (corpus -> spend) -------- */
@@ -401,7 +520,7 @@
     renderVarOutputs();
     renderPart1();
     renderRange();
-    renderTornado();
+    renderStress();
     renderEnoughLens();
     renderEnoughTable();
     renderLifestyleLens();
@@ -413,6 +532,17 @@
     // Main five variables
     ["age", "life", "ret", "infl", "spend"].forEach((id) =>
       $(id).addEventListener("input", renderAll)
+    );
+    // Part 2 uncertainty sliders
+    ["u-ret", "u-infl", "u-life"].forEach((id) =>
+      $(id).addEventListener("input", renderRange)
+    );
+    // Part 3 error sliders + stack toggles
+    ["e-ret", "e-infl", "e-spend"].forEach((id) =>
+      $(id).addEventListener("input", renderStress)
+    );
+    ["t-ret", "t-infl", "t-spend"].forEach((id) =>
+      $(id).addEventListener("change", renderStress)
     );
     // Lens 4
     ["e-corpus", "e-age"].forEach((id) =>
