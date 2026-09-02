@@ -87,7 +87,7 @@ strong { color: var(--ink); font-weight: 600; }
   color: var(--gold-soft); font-weight: 600; margin: 0 0 18px;
 }
 .hero h1 { font-size: clamp(2.1rem, 5.5vw, 3.6rem); margin: 0 0 22px; }
-.lede { font-size: clamp(1.02rem, 2vw, 1.22rem); color: var(--ink-soft); max-width: 60ch; margin: 0 0 30px; }
+.lede { font-size: clamp(1.02rem, 2vw, 1.22rem); color: var(--ink-soft); margin: 0 0 30px; }
 
 .hero-nav { display: flex; flex-wrap: wrap; gap: 10px; }
 .hero-nav a {
@@ -99,7 +99,7 @@ strong { color: var(--ink); font-weight: 600; }
 
 /* ---------- Sections ---------- */
 .part { padding: 60px 0; border-top: 1px solid var(--line); scroll-margin-top: 76px; }
-.part-head { max-width: 62ch; margin-bottom: 30px; }
+.part-head { margin-bottom: 30px; }
 .part-num {
   display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--gold-soft);
@@ -114,7 +114,12 @@ strong { color: var(--ink); font-weight: 600; }
   padding: 26px; box-shadow: var(--shadow);
 }
 
-.footnote { color: var(--ink-mute); font-size: 0.85rem; margin: 16px 2px 0; max-width: 68ch; }
+.footnote { color: var(--ink-mute); font-size: 0.85rem; margin: 16px 2px 0; }
+.lines span { display: block; }
+.lines span + span { margin-top: 0.55em; }
+.footnote.assumptions { max-width: none; }
+.assumptions span { display: block; white-space: nowrap; }
+.assumptions span + span { margin-top: 3px; }
 
 /* ---------- Controls / sliders ---------- */
 .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 34px; }
@@ -277,7 +282,7 @@ table.grid tr.hot-row td { color: var(--ink); }
 
 .decision-rule { margin-top: 26px; text-align: center; }
 .rule-quote { font-family: "Fraunces", serif; font-size: clamp(1.3rem, 3vw, 1.8rem); color: var(--gold); margin: 0 0 14px; }
-.decision-rule p:last-child { color: var(--ink-soft); max-width: 62ch; margin: 0 auto; }
+.decision-rule p:last-child { color: var(--ink-soft); margin: 0 auto; }
 
 /* ---------- Outbound "read the article" links ---------- */
 .read-article {
@@ -374,4 +379,5 @@ table.grid tr.hot-row td { color: var(--ink); }
   .crumb-rest { display: none; }
   .topbar-right { gap: 12px; }
   .disclaimer span { white-space: normal; }
+  .assumptions span { white-space: normal; }
 }

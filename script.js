@@ -114,7 +114,7 @@
     const spread = con - opt;
     const ratio = con / opt;
     $("range-caption").innerHTML =
-      "Same person, same spending. The prudent number is <strong>" +
+      "All three are built from the five variables you set in Part 1 — same person, same spending. The prudent number is <strong>" +
       ratio.toFixed(1) + "×</strong> the optimistic one — a spread of <strong>" +
       money(spread) + "</strong>. A rule-of-thumb multiple picks one dot on this line and calls it certainty.";
   }
@@ -153,7 +153,7 @@
     const allPct = (allDelta / base) * 100;
     $("stack-val").textContent = money(all);
     $("stack-delta").innerHTML =
-      "+" + money(allDelta) + " over your base — <strong>+" + allPct.toFixed(0) +
+      "+" + money(allDelta) + " over your Part 1 number — <strong>+" + allPct.toFixed(0) +
       "%</strong> more corpus, from four small, plausible slips.";
   }
 
