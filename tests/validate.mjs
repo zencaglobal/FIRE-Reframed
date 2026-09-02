@@ -175,8 +175,8 @@ console.log("\n4) Part 3 drawdown is consistent with the corpus formula");
       }
     }
   }
-  ok(worst <= 1, "corpus drawn down under its own assumptions runs out at the horizon",
-     "max age error = " + worst + " year(s) across 400 scenarios");
+  ok(worst === 0, "corpus drawn down under its own assumptions runs out exactly at the horizon",
+     "max age error = " + worst + " year(s) across 400 scenarios (0 = no phantom shortfall with no errors)");
 }
 
 console.log(`\n${failed === 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED"} — ${passed} passed, ${failed} failed`);

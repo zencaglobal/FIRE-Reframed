@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=1788350001" />
+  <link rel="stylesheet" href="style.css?v=1788350593" />
 </head>
 <body>
   <!-- Top bar -->
@@ -83,11 +83,11 @@
         </div>
         <div class="ctrl">
           <label for="ret">Expected return (post-retirement) <output id="ret-out"></output></label>
-          <input type="range" id="ret" min="3" max="12" step="0.5" value="8" />
+          <input type="range" id="ret" min="1" max="20" step="0.5" value="8" />
         </div>
         <div class="ctrl">
           <label for="infl">Your personal inflation <output id="infl-out"></output></label>
-          <input type="range" id="infl" min="3" max="12" step="0.5" value="7" />
+          <input type="range" id="infl" min="1" max="20" step="0.5" value="7" />
         </div>
         <div class="ctrl ctrl-wide">
           <label for="spend">Monthly spend today <output id="spend-out"></output></label>
@@ -440,7 +440,7 @@ where  k = (1 + inflation) ÷ (1 + return)</pre>
     </div>
   </footer>
 
-  <script src="script.js?v=1788350001"></script>
+  <script src="script.js?v=1788350593"></script>
 
   <!-- Analytics: GoatCounter (cookieless, privacy-friendly) -->
   <script data-goatcounter="https://fire-reframed.goatcounter.com/count"

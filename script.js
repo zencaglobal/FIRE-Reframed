@@ -208,10 +208,11 @@
     const pts = [[age0, bal]];
     let runout = null;
     for (let t = 0; t < capAge - age0; t++) {
-      bal -= annual0 * Math.pow(1 + g, t);        // withdraw at start of year
-      if (bal <= 0) { runout = age0 + t; pts.push([age0 + t, 0]); break; }
+      const w = annual0 * Math.pow(1 + g, t);      // this year's withdrawal
+      if (bal < w - 1) { runout = age0 + t; pts.push([age0 + t, 0]); break; } // can't fund this year (₹1 tolerance)
+      bal -= w;                                    // withdraw at start of year
       bal *= (1 + r);                              // remainder grows
-      pts.push([age0 + t + 1, bal]);
+      pts.push([age0 + t + 1, Math.max(0, bal)]);
     }
     if (runout === null) runout = capAge;
     return { pts, runout };
