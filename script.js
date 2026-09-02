@@ -286,7 +286,7 @@
       $("p3-early").textContent = early + (early === 1 ? " year" : " years") + " early";
     } else {
       rc.classList.add("on-plan");
-      $("p3-early").textContent = "on plan — lasts to " + finish;
+      $("p3-early").textContent = "as per plan";
     }
 
     drawChart(plan, reality, v.age, finish, runout);
@@ -310,7 +310,7 @@
         "</strong>. Toggle another on and watch them stack.";
     } else if (ind.length === 0) {
       $("p3-stack").textContent = "No slips active — your Part 1 corpus lasts to " + finish +
-        ", exactly as planned. Toggle a slip on.";
+        ", exactly as planned. Toggle on 1 or more slips to see the impact.";
     } else {
       $("p3-stack").textContent = "Small enough that the corpus still lasts to " + finish + ". Nudge them up.";
     }
