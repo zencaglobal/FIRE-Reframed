@@ -271,8 +271,8 @@
     const eRet = onRet ? sRet : 0, eInfl = onInfl ? sInfl : 0, eSpend = onSpend ? sSpend : 0;
 
     const C = requiredCorpus(v.annual, v.years, v.ret, v.infl);
-    const finish = v.life;
-    const cap = Math.max(v.life + 20, 110);
+    const finish = v.age + v.years; // = life expectancy, but never <= current age
+    const cap = Math.max(finish + 20, 130);
     const plan = drawdown(C, v.monthly, v.ret, v.infl, v.age, finish);
     const reality = drawdown(C, v.monthly * (1 + eSpend / 100), v.ret - eRet, v.infl + eInfl, v.age, cap);
     const runout = Math.min(reality.runout, cap);
@@ -329,19 +329,26 @@
     return best;
   }
 
+  // highlight a table column only when the retire age falls within the
+  // reference table's own age range (the article tables run 25–60)
+  function hotAgeIndex(val) {
+    return val >= AGES[0] && val <= AGES[AGES.length - 1] ? nearestIndex(AGES, val) : -1;
+  }
+  const plYr = (n) => n + (n === 1 ? " year" : " years");
+
   function renderEnoughLens() {
     const c = +$("e-corpus").value;
     const age = +$("e-age").value;
-    const years = LIFE_TABLE - age;
+    const years = Math.max(1, LIFE_TABLE - age);
     $("e-corpus-out").textContent = money(c);
     $("e-age-out").textContent = age;
     const monthly = c / years / 12;
     $("e-monthly").textContent = money(monthly) + "/mo";
-    $("e-note").textContent = "for " + years + " years, if returns only keep pace with inflation";
+    $("e-note").textContent = "for " + plYr(years) + ", if returns only keep pace with inflation";
   }
 
   function renderEnoughTable() {
-    const hotAge = nearestIndex(AGES, +$("e-age").value);
+    const hotAge = hotAgeIndex(+$("e-age").value);
     const hotCorpus = nearestIndex(CORPUS_ROWS, +$("e-corpus").value);
     let html = "<tr><th>Corpus \\ Retire at</th>";
     AGES.forEach((a) => (html += "<th>" + a + "</th>"));
@@ -350,7 +357,7 @@
       html += "<tr" + (ri === hotCorpus ? ' class="hot-row"' : "") + "><td>" + money(c) + "</td>";
       AGES.forEach((a, ci) => {
         const monthly = c / (LIFE_TABLE - a) / 12;
-        const hot = ri === hotCorpus && ci === hotAge ? ' class="hot"' : "";
+        const hot = hotAge >= 0 && ri === hotCorpus && ci === hotAge ? ' class="hot"' : "";
         html += "<td" + hot + ">" + money(monthly) + "</td>";
       });
       html += "</tr>";
@@ -365,16 +372,16 @@
   function renderLifestyleLens() {
     const m = +$("l-spend").value;
     const age = +$("l-age").value;
-    const years = LIFE_TABLE - age;
+    const years = Math.max(1, LIFE_TABLE - age);
     $("l-spend-out").textContent = money(m) + "/mo";
     $("l-age-out").textContent = age;
     const corpus = m * 12 * years;
     $("l-corpus").textContent = money(corpus);
-    $("l-note").textContent = "to fund that life for " + years + " years (returns matching inflation)";
+    $("l-note").textContent = "to fund that life for " + plYr(years) + " (returns matching inflation)";
   }
 
   function renderLifestyleTable() {
-    const hotAge = nearestIndex(AGES, +$("l-age").value);
+    const hotAge = hotAgeIndex(+$("l-age").value);
     const hotSpend = nearestIndex(SPEND_ROWS, +$("l-spend").value);
     let html = "<tr><th>Lifestyle \\ Retire at</th>";
     AGES.forEach((a) => (html += "<th>" + a + "</th>"));
@@ -383,7 +390,7 @@
       html += "<tr" + (ri === hotSpend ? ' class="hot-row"' : "") + "><td>" + money(m) + "/mo</td>";
       AGES.forEach((a, ci) => {
         const corpus = m * 12 * (LIFE_TABLE - a);
-        const hot = ri === hotSpend && ci === hotAge ? ' class="hot"' : "";
+        const hot = hotAge >= 0 && ri === hotSpend && ci === hotAge ? ' class="hot"' : "";
         html += "<td" + hot + ">" + money(corpus) + "</td>";
       });
       html += "</tr>";

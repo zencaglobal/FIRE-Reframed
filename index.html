@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=1788350001" />
 </head>
 <body>
   <!-- Top bar -->
@@ -75,11 +75,11 @@
       <div class="controls card">
         <div class="ctrl">
           <label for="age">Current age <output id="age-out"></output></label>
-          <input type="range" id="age" min="25" max="60" step="1" value="40" />
+          <input type="range" id="age" min="1" max="100" step="1" value="40" />
         </div>
         <div class="ctrl">
           <label for="life">Life expectancy <output id="life-out"></output></label>
-          <input type="range" id="life" min="75" max="100" step="1" value="90" />
+          <input type="range" id="life" min="1" max="100" step="1" value="90" />
         </div>
         <div class="ctrl">
           <label for="ret">Expected return (post-retirement) <output id="ret-out"></output></label>
@@ -244,7 +244,7 @@
           </div>
           <div class="ctrl">
             <label for="e-age">Retire at age <output id="e-age-out"></output></label>
-            <input type="range" id="e-age" min="25" max="60" step="1" value="40" />
+            <input type="range" id="e-age" min="1" max="100" step="1" value="40" />
           </div>
         </div>
         <div class="lens-out">
@@ -279,7 +279,7 @@
           </div>
           <div class="ctrl">
             <label for="l-age">Retire at age <output id="l-age-out"></output></label>
-            <input type="range" id="l-age" min="25" max="60" step="1" value="40" />
+            <input type="range" id="l-age" min="1" max="100" step="1" value="40" />
           </div>
         </div>
         <div class="lens-out">
@@ -440,7 +440,7 @@ where  k = (1 + inflation) ÷ (1 + return)</pre>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=1788350001"></script>
 
   <!-- Analytics: GoatCounter (cookieless, privacy-friendly) -->
   <script data-goatcounter="https://fire-reframed.goatcounter.com/count"
