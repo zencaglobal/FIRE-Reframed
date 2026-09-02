@@ -94,6 +94,57 @@
   const pmPct = (x) => "±" + x + "%";
   const pmYrs = (x) => "±" + x + (x === 1 ? " yr" : " yrs");
 
+  // "nice" axis step (1 / 2 / 5 × 10^n) for ~4 divisions
+  function niceStep(max) {
+    const rough = Math.max(max, 1e-9) / 4;
+    const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    const f = rough / mag;
+    return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  }
+
+  // Draw the corpus band on a real ₹/$ axis (SVG into #range-svg).
+  function drawBand(opt, base, con, annual) {
+    const W = 640, padL = 10, padR = 10, plotW = W - padL - padR;
+    const maxV = Math.max(con, annual * 40) * 1.08;
+    const X = (v) => padL + (Math.min(100, (v / maxV) * 100) / 100) * plotW;
+    const unitDiv = mode === "inr" ? 1e7 : 1e8;
+    const step = niceStep(maxV / unitDiv);
+    const fmtN = (n) => Math.round(n * 100) / 100;
+    const bandTop = 44, bandH = 26, mid = bandTop + bandH / 2;
+    let s = "";
+    for (let tv = 0; tv <= maxV / unitDiv + 1e-9; tv += step) {
+      const x = X(tv * unitDiv);
+      s += '<line x1="' + x.toFixed(1) + '" y1="24" x2="' + x.toFixed(1) + '" y2="100" stroke="#2c313d" stroke-width="1"/>';
+      const lab = tv < 1e-9 ? "0" : (mode === "inr" ? "₹" + fmtN(tv) + " Cr" : "$" + fmtN(tv) + "M");
+      s += '<text x="' + x.toFixed(1) + '" y="116" fill="#7f8696" font-size="10" text-anchor="middle">' + lab + "</text>";
+    }
+    s += '<defs><linearGradient id="bandgrad" x1="0" x2="1" y1="0" y2="0">' +
+      '<stop offset="0" stop-color="#6fcf97"/><stop offset="0.5" stop-color="#e5b769"/>' +
+      '<stop offset="1" stop-color="#e07a5f"/></linearGradient></defs>';
+    const bx = X(opt), bw = Math.max(2, X(con) - X(opt));
+    s += '<rect x="' + bx.toFixed(1) + '" y="' + bandTop + '" width="' + bw.toFixed(1) +
+      '" height="' + bandH + '" rx="' + (bandH / 2) + '" fill="url(#bandgrad)"/>';
+    const xb = X(base);
+    s += '<line x1="' + xb.toFixed(1) + '" y1="36" x2="' + xb.toFixed(1) + '" y2="' + (bandTop + bandH + 4) +
+      '" stroke="#eef0f4" stroke-width="2"/>';
+    const lxb = Math.min(W - 62, Math.max(62, xb));
+    s += '<text x="' + lxb.toFixed(1) + '" y="30" fill="#eef0f4" font-size="11" font-weight="600" text-anchor="middle">Your Part 1 number</text>';
+    if (X(con) - X(opt) > 34) {
+      s += '<text x="' + (bx - 6).toFixed(1) + '" y="' + (mid + 3.5).toFixed(1) +
+        '" fill="#b7bcc8" font-size="10" text-anchor="end">' + money(opt) + "</text>";
+      s += '<text x="' + (X(con) + 6).toFixed(1) + '" y="' + (mid + 3.5).toFixed(1) +
+        '" fill="#b7bcc8" font-size="10" text-anchor="start">' + money(con) + "</text>";
+    }
+    [25, 30, 40].forEach((m) => {
+      const x = X(annual * m);
+      s += '<line x1="' + x.toFixed(1) + '" y1="' + (bandTop + bandH + 2) + '" x2="' + x.toFixed(1) +
+        '" y2="' + (bandTop + bandH + 12) + '" stroke="#c9a24f" stroke-width="1"/>';
+      s += '<text x="' + x.toFixed(1) + '" y="' + (bandTop + bandH + 24) +
+        '" fill="#c9a24f" font-size="10" text-anchor="middle">' + m + "×</text>";
+    });
+    $("range-svg").innerHTML = s;
+  }
+
   function renderRange() {
     const v = vars();
     const u = unc();
@@ -107,16 +158,7 @@
     const opt = requiredCorpus(v.annual, optYears, v.ret + u.r, Math.max(0, v.infl - u.g));
     const con = requiredCorpus(v.annual, conYears, Math.max(0, v.ret - u.r), v.infl + u.g);
 
-    const maxV = Math.max(con, v.annual * 40) * 1.08;
-    const pos = (x) => Math.min(100, (x / maxV) * 100);
-
-    const fill = $("band-fill");
-    fill.style.left = pos(opt) + "%";
-    fill.style.width = Math.max(0.6, pos(con) - pos(opt)) + "%";
-    $("mark-base").style.left = pos(base) + "%";
-    document.querySelectorAll(".band-tick").forEach((t) => {
-      t.style.left = pos(v.annual * +t.dataset.mult) + "%";
-    });
+    drawBand(opt, base, con, v.annual);
 
     $("range-opt").textContent = money(opt);
     $("range-base").textContent = money(base);
